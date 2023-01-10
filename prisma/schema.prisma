@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Stream {
+  id Int @id @default(autoincrement())
+  streamName String
+  students Student[]
+  courses StreamCourses[]
+}
+
+model Student {
+  id Int @id @default(autoincrement())
+  studentName String
+  stream Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
+  streamId Int
+  assessments StudentAssesment[]
+  studentTotalPoint StudentTotalPoint?
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+  courseName String
+  streams StreamCourses[]
+  assessments Assessment[]
+}
+
+model Assessment {
+  id Int @id @default(autoincrement())
+  assessmentName String
+  assessmentPoint Int
+  course Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId Int
+  students StudentAssesment[]
+}
+
+model StreamCourses {
+  id Int @id @default(autoincrement())
+  stream Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id])
+  streamId Int
+  courseId Int
+}
+
+model StudentAssesment {
+  id Int @id @default(autoincrement())
+  student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  assessment Assessment? @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  studentId Int
+  assessmentId Int
+  achievedPoint Int
+}
+
+model StudentTotalPoint {
+  id Int @id @default(autoincrement())
+  student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId Int @unique
+  totalPoints Int
+  totalAchievedPoints Int
+  percentageScore Float
+}
+
+model Auth {
+  id Int @id @default(autoincrement())
+  username String @unique
+  password String
+  isAdmin Boolean
+}
