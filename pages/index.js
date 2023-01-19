@@ -42,55 +42,65 @@ export default function Home({ session, streamDataFromDB, studentDataFromDB }) {
 }
 
 export async function getServerSideProps(context) {
-  const session = await getSession(context);
+  try {
+    const session = await getSession(context);
 
-  const studentData = await prisma.student.findMany({
-    include: {
-      stream: true,
-      assessments: { include: { assessment: true } },
-      studentTotalPoint: true,
-    },
-    orderBy: [
-      {
-        studentTotalPoint: {
-          percentageScore: "desc",
+    const studentData = await prisma.student.findMany({
+      include: {
+        stream: true,
+        assessments: { include: { assessment: true } },
+        studentTotalPoint: true,
+      },
+      orderBy: [
+        {
+          studentTotalPoint: {
+            percentageScore: "desc",
+          },
         },
-      },
-      {
-        studentName: "asc",
-      },
-    ],
-  });
+        {
+          studentName: "asc",
+        },
+      ],
+    });
 
-  const streamData = await prisma.stream.findMany();
+    const streamData = await prisma.stream.findMany();
 
-  let streamDataFromDB = [];
-  let studentDataFromDB = [];
+    let streamDataFromDB = [];
+    let studentDataFromDB = [];
 
-  if (streamData.length > 0 && studentData.length > 0) {
-    for (let i = 0; i < studentData.length; i++) {
-      if (i === 0) {
-        studentData[i].rank = 1;
-      } else {
-        if (
-          studentData[i - 1]?.studentTotalPoint?.percentageScore >
-          studentData[i]?.studentTotalPoint?.percentageScore
-        ) {
-          studentData[i].rank = studentData[i - 1].rank + 1;
+    if (streamData.length > 0 && studentData.length > 0) {
+      for (let i = 0; i < studentData.length; i++) {
+        if (i === 0) {
+          studentData[i].rank = 1;
         } else {
-          studentData[i].rank = studentData[i - 1].rank;
+          if (
+            studentData[i - 1]?.studentTotalPoint?.percentageScore >
+            studentData[i]?.studentTotalPoint?.percentageScore
+          ) {
+            studentData[i].rank = studentData[i - 1].rank + 1;
+          } else {
+            studentData[i].rank = studentData[i - 1].rank;
+          }
         }
       }
+      streamDataFromDB = streamData;
+      studentDataFromDB = studentData;
     }
-    streamDataFromDB = streamData;
-    studentDataFromDB = studentData;
-  }
 
-  return {
-    props: {
-      session,
-      streamDataFromDB,
-      studentDataFromDB,
-    },
-  };
+    return {
+      props: {
+        session,
+        streamDataFromDB,
+        studentDataFromDB,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        session: undefined,
+        streamDataFromDB: [],
+        studentDataFromDB: [],
+      },
+    };
+  }
 }

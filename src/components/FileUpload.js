@@ -272,7 +272,8 @@ const FileUpload = () => {
         const percentage =
           (studentTotalScore /
             streamAndAssesmentWithMoreData[stream].totalScore) *
-          100;
+            100 || 0;
+
         temp["percentageScore"] =
           Math.round(percentage * 100 + Number.EPSILON) / 100;
 
@@ -281,6 +282,11 @@ const FileUpload = () => {
     });
     tempStuArr.sort((a, b) => b["percentageScore"] - a["percentageScore"]);
 
+    console.log("tempStuArr: ", tempStuArr);
+    console.log(
+      "streamAndAssesmentWithMoreData: ",
+      streamAndAssesmentWithMoreData
+    );
     writeToDB(
       streamAndStudents,
       courseAndStreams,

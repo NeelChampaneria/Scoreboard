@@ -6,7 +6,6 @@ import styles from "../../styles/FileUpload.module.css";
 const XLSX = require("xlsx");
 
 const FileDownload = ({ studentData }) => {
-  console.log("studentData: ", studentData);
   const [loading, setLoading] = useState(false);
 
   const exportDataToXlsx = async () => {
