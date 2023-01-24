@@ -36,7 +36,7 @@ model Course {
 model Assessment {
   id Int @id @default(autoincrement())
   assessmentName String
-  assessmentPoint Int
+  assessmentPoint Float
   course Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId Int
   students StudentAssesment[]
@@ -56,15 +56,15 @@ model StudentAssesment {
   assessment Assessment? @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   studentId Int
   assessmentId Int
-  achievedPoint Int
+  achievedPoint Float
 }
 
 model StudentTotalPoint {
   id Int @id @default(autoincrement())
   student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId Int @unique
-  totalPoints Int
-  totalAchievedPoints Int
+  totalPoints Float
+  totalAchievedPoints Float
   percentageScore Float
 }
 
